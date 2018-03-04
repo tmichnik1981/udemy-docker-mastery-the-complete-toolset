@@ -4,6 +4,7 @@
 
 - [Course github](https://github.com/bretfisher/udemy-docker-mastery)
 - [Docker store](https://store.docker.com/)
+- [Containers internals](https://www.youtube.com/watch?v=sK5i-N34im8&feature=youtu.be&list=PLBmVKD7o3L8v7Kl_XXh3KaJl9Qw2lyuFl)
 
 #### Docker Editions
 
@@ -103,5 +104,105 @@ Docker on Windows Server 2016
    Add-Content $PROFILE "`nImport-Module posh-docker"
    ```
 
-#### Docker Toolbox for Windows
+#### Installing Docker on Linux
+
+- get.docker.com script
+  - curl -sSL https://get.docker.com/ | sh
+- store.docker.com
+
+##### Docker for Linux: Setup
+
+1. Install Docker
+
+   ```shell
+   curl -fsSL get.docker.com -o get-docker.sh
+   ```
+
+2. Add user to **docker** group
+
+   ```shell
+   sudo usermod -aG docker <user>
+   ```
+
+3. Install docker machine 
+
+   - [install-machine](https://docs.docker.com/machine/install-machine/)
+
+   ```shell
+   curl -L https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-`uname -s`-`uname -m` >/tmp/docker-machine && \
+   sudo install /tmp/docker-machine /usr/local/bin/docker-machine
+   ```
+
+4. Install docker compose
+
+   - [install docker-compose](https://docs.docker.com/compose/install/)
+   - or a newer one [github compose](https://github.com/docker/compose/releases)
+
+   ```shell
+   curl -L https://github.com/docker/compose/releases/download/1.20.0-rc1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+   chmod +x /usr/local/bin/docker-compose
+   ```
+
+#### Creating and using containers
+
+##### Checkout Docker install and config
+
+```shell
+# check version
+docker version
+# variables
+docker info
+```
+
+##### Starting Nginx server
+
+- image is an application we want to run
+- container is an instance of that image running as a process
+- You can have many containers running off the same image
+- default reginstry: hub.docker.com
+
+```shell
+# running (downloading first) nginx and routing trafic to port 80
+docker container run --publish 80:80 nginx
+
+# detached mode runs docker app in the backgroud
+docker container run --publish 80:80 --detach nginx
+# stopping container
+docker container stop <CONTAINER_ID> 
+```
+- run vs start - run always creates  a new one
+- name - is randomly generated
+
+```shell
+# running  nginx with a name 'webhost'
+docker container run --publish 80:80 --detach --name webhost nginx 
+# checking logs
+docker container logs webhost
+# displaying of running processes of a container
+docker container top webhost
+# listening all containers
+docker container ls -a
+# removing containers 
+# running containers won't be removed
+docker container rm <CONTAINER_ID> <CONTAINER_ID>...
+# removing with force option
+docker container rm -f <CONTAINER_ID>
+```
+
+#### Manage Multiple Containers
+
+- docs.docker.com
+
+```shell
+# run nginx
+docker container run -p 80:80 -d --name webhost nginx 
+# run httpd
+docker container run -p 8080:80 -d --name apache httpd 
+# run mysql
+# -e passing environment variables 
+# GENERATED ROOT PASSWORD: oboe3eVaixiocheeDeePhohdohreepa7
+docker container run -p 3306:3306 -dit -e MYSQL_RANDOM_ROOT_PASSWORD=yes --name mysql mysql 
+
+
+```
 
