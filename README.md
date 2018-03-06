@@ -206,3 +206,70 @@ docker container run -p 3306:3306 -dit -e MYSQL_RANDOM_ROOT_PASSWORD=yes --name 
 
 ```
 
+#### CLI Process Monitoring
+
+```shell
+# process list in one container
+docker container top <CONTAINER>
+# details of one container config
+docker container inspect <CONTAINER>
+# performance stats for all containers
+docker container stats 
+# GENERATED ROOT PASSWORD: caekugh9aew6thie8eiJahleeH0oo5Ie
+```
+
+#### Getting a Shell inside Containers
+
+- [package management](https://www.digitalocean.com/community/tutorials/package-management-basics-apt-yum-dnf-pkg)
+
+```shell
+# start new container interactively
+docker container run -it
+
+# run additional command in existing container
+docker container exec -it
+
+# runs bash in a container. Container will stop if you leave a bsh
+# -it allows to use terminal
+# -t simulates terminal
+# -i keep session to stdin
+docker container run -it --name proxy nginx bash
+
+# starting bash in a runnning container: mysql
+docker container exec -it mysql bash
+
+```
+
+#### Docker Networks: Concepts
+
+- [format command](https://docs.docker.com/config/formatting/)
+
+
+- Each container connected to a private virtual network "bridge"
+
+- Each virtual network routes through NAT firewall on hot IP
+
+- All containers on a virt. net. talk to each other without -p
+
+- Best practice is to create a new virt. netw. for each app (web server + db is one app)  
+
+- By default container does not use the same ip as its host
+
+- You can:
+
+  - Make new virtual networks
+  - Attach containers to more then one virtual network
+  - Skip virtual networks and use host IP (--net=host)
+  - Use different Docker network drivers to gain new abilities 
+
+  ```shell
+  # -p - publish (port)
+  # format HOST:CONTAINER
+  docker container run -p 80:80 --name webhost -d nginx
+
+  # looking for NetworkSettings.IPAddress  in a json result
+  docker container inspect --format '{{ .NetworkSettings.IPAddress }}' webhost
+  ```
+
+  ​
+
