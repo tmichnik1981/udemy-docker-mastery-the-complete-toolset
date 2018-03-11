@@ -240,7 +240,9 @@ docker container exec -it mysql bash
 
 ```
 
-#### Docker Networks: Concepts
+#### Docker Networks
+
+##### Concepts
 
 - [format command](https://docs.docker.com/config/formatting/)
 
@@ -271,5 +273,95 @@ docker container exec -it mysql bash
   docker container inspect --format '{{ .NetworkSettings.IPAddress }}' webhost
   ```
 
-  ​
+
+
+##### CLI Management
+
+```shell
+# show networks
+docker network ls
+
+# - bridge (default) network between docker and physical network
+# - host special network which skips docker virtual network and connect container directly to host's network (more performance, but less secure)  
+# - none - interface unattached to anything
+NETWORK ID          NAME                DRIVER              SCOPE
+d778f121a6d4        bridge              bridge              local
+4037c811687c        host                host                local
+4efb901c93bb        none                null                local
+
+# inspect a network
+docker network inspect
+# create a network 
+# --driver optional
+docker network create --driver
+# attach a network to container
+docker network connect
+# detach a network from container 
+docker network disconnect
+# running container and attaching it to my_app_nett network
+docker container run --name webhost -d --network my_app_nett nginx
+# connecting / disconnecting container to network
+docker network connect <NETWORK_ID> <CONTAINER_ID>
+docker network disconnect <NETWORK_ID> <CONTAINER_ID>
+
+```
+
+##### DNS
+
+- Static IP's for talking to containers is an antipatern
+- Docker defaults the hostname to the container's name, but you can also set aliases
+- Default Bridge network doest not have DNS feture. You can either use `--link` or create a new network.
+
+###### Round Robin test
+
+1. Create a network
+   - `docker network create dude`
+2. Run 2 containers `elasticsearch:2` with alias **search**
+   - `docker container run -d --net dude --net-alias search elasticsearch:2`
+3. Run **nslookup** in **alpine** image
+   - `docker container run --rm --net dude alpine nslookup search`
+4. Run curl in centos image
+   - `docker container run --rm --net dude centos curl -s search:9200`
+
+#### Container images
+
+- [Image docs](https://github.com/moby/moby/blob/master/image/spec/v1.md)
+- Image - app binaries and dependencies and metadata about the image data and how to run the image
+- not a complete OS, no kernel, no kernel modules 
+- [Official images](https://github.com/docker-library/official-images/tree/master/library)
+
+##### Docker HUB
+
+- image might has one or more tags
+- "latest" - the newest software
+- on production always specify the exact version
+- each line in Docker Hub refers to one version
+
+##### Image layers
+
+- display history of an image nginx
+  - `docker history nginx:latest`
+- every change made on an image is a layer
+- each layer has a unique SHA
+- layers are shared and reused
+- running a container creates new container layer
+- changing files in an image from a container will cause coping those changed files to container layer 
+- display metadata about the image
+  - docker image inspect nginx
+
+##### Image Tagging and pushing
+
+- latest tag - is the default tag but image owners should assign it to the newest stable version
+- tagging
+  - `docker image tag <SOURCE_IMAGE[:TAG]> <TARGET_IMAGE[:TAG]>`
+- pushing - uploads changed layers to a image registry
+  - `docker image push brefisher/nginx`
+- logging in Hub
+  - `docker login <SERVER>`
+- logging out
+  - `docker logout`
+
+#### Building images
+
+- [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 
