@@ -365,3 +365,53 @@ docker network disconnect <NETWORK_ID> <CONTAINER_ID>
 
 - [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 
+  ```dockerfile
+  FROM debian:jessie # base image
+
+  ENV NGINX_VERSION 1.11.10-1 # env variables for passing values for buildin and running containers
+
+  # running shellcommands inside container
+  RUN apt-key adv .....\
+  && echo 'wrewfw' \
+  && apt-get..
+
+  # linking logs to docker standard output 
+  ln -sf /dev/stdout /var/log/nginx/access.log \
+  && ln -sf /dev/stderr /var/log/nginx/error.log
+
+  # exposing ports
+  # allows docker to reveive packets on that ports
+  EXPOSE 80 443
+  # command executed everytime we run a container
+  CMD ["nginx", "-g", "daemon off;"]
+
+  # changing work directory in a container
+  WORKDIR /usr/share/nginx/html
+  # copying fole form local disk into the container image
+  COPY index.html index.html
+  ```
+
+- If one line in a dockerfile changes, all subsequent lines need to be rebuild
+
+- `CMD` and `ENTRYFILE` are enherited 
+
+- Running build
+
+  ```shell
+  docker build -f some-dockerfile
+
+  # running image build in a current dorrectory
+  # -t naming
+  docker image build -t customnginx .
+  ```
+
+- [node Docker good defaults](https://github.com/BretFisher/node-docker-good-defaults)
+
+
+#### Container Lifetime & Persistent Data
+
+- [Manage data in Docker](https://docs.docker.com/storage/)
+- [12 factor app](https://12factor.net/)
+- [12 Fractured Apps](https://medium.com/@kelseyhightower/12-fractured-apps-1080c73d481c)
+- [Immutable infrastructure](https://www.oreilly.com/ideas/an-introduction-to-immutable-infrastructure)
+
